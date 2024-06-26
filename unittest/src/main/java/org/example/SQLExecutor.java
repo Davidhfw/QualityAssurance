@@ -3,6 +3,11 @@ package org.example;
 import java.sql.*;
 
 public class SQLExecutor {
+    private Connection connection;
+
+    public SQLExecutor(Connection connection) {
+        this.connection = connection;
+    }
     /**
      * 执行SQL查询并返回结果。
      *
@@ -12,18 +17,18 @@ public class SQLExecutor {
      * @param password 数据库密码
      * @return 查询结果的List，如果是SELECT语句;否则返回null
      */
-    public static ResultSet executeSQL(String sqlQuery, String dbUrl, String username, String password) {
+    public ResultSet executeSQL(String sqlQuery, String dbUrl, String username, String password) {
         try {
             // 连接到PostgreSQL数据库
-            Connection conn = DriverManager.getConnection(dbUrl, username, password);
-            Statement stmt = conn.createStatement();
+           // Connection conn = connection(dbUrl, username, password);
+            Statement stmt = connection.createStatement();
 
             // 执行SQL查询
             if (sqlQuery.startsWith("SELECT")) {
                 return stmt.executeQuery(sqlQuery);
             } else {
                 stmt.executeUpdate(sqlQuery);
-                conn.commit();
+                connection.commit();
                 return null;
             }
         } catch (SQLException e) {
