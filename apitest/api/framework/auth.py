@@ -1,8 +1,8 @@
-from flask import Flask, request, jsonify
+
 import jwt
 import datetime
 
-from apitest.api.api_exceptions import ClientAuthFailed
+from apitest.api.framework.self_define_exceptions import ClientAuthFailed
 
 # 用于签名的密钥
 SECRET_KEY = 'your_secret_key'
