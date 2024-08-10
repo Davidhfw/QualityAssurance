@@ -331,19 +331,19 @@ def _update_cluster(cluster_id, name, desc, delete_protection):
             data = (delete_protection, cluster_id)
 
         elif cluster_id and name and desc:
-            update_query = "UPDATE cluster SET name = %s and description = %s WHERE cluster_id = %s"
+            update_query = "UPDATE cluster SET name = %s, description = %s WHERE cluster_id = %s"
             data = (name, desc, cluster_id)
 
         elif cluster_id and name and delete_protection:
-            update_query = "UPDATE cluster SET name = %s and delete_protection = %s WHERE cluster_id = %s"
+            update_query = "UPDATE cluster SET name = %s, delete_protection = %s WHERE cluster_id = %s"
             data = (name, delete_protection, cluster_id)
 
         elif cluster_id and desc and delete_protection:
-            update_query = "UPDATE cluster SET delete_protection = %d and description = %s WHERE cluster_id = %s"
+            update_query = "UPDATE cluster SET delete_protection = %d , description = %s WHERE cluster_id = %s"
             data = (desc, delete_protection, cluster_id)
 
         elif cluster_id and name and desc and delete_protection:
-            update_query = "UPDATE cluster SET name = %s and description = %s and delete_protection = %d WHERE cluster_id = %s"
+            update_query = "UPDATE cluster SET name = %s, description = %s,  delete_protection = %d WHERE cluster_id = %s"
             data = (name, desc, delete_protection, cluster_id)
 
         db.update_sql(update_query, data)
@@ -357,11 +357,9 @@ def _update_cluster(cluster_id, name, desc, delete_protection):
 def _update_cluster_by_status(cluster_id, **kwargs):
     try:
         db.connect()
-        update_query = ""
-        data = ()
         phase = kwargs.get("status_phase")
         condition_type = kwargs.get("status_condition_type")
-        update_query = "UPDATE cluster SET status_phase = %s and status_condition_type = %s WHERE cluster_id = %s"
+        update_query = "UPDATE cluster SET status_phase = %s, status_condition_type = %s WHERE cluster_id = %s"
         data = (phase, condition_type, cluster_id)
         db.update_sql(update_query, data)
     except Exception as e:
