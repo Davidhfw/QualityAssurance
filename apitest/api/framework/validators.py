@@ -25,10 +25,11 @@ def validate_cluster_name(name):
         # 检查长度是否在2到64之间
         if 2 <= len(name) <= 64:
             # 检查是否至少包含3种不同的字符类型
-            if (any(c.isupper() for c in name) and
-                    any(c.islower() for c in name) and
-                    any(c.isdigit() for c in name) and
-                    (any(c in '_-' for c in name))):
+            rule1 = (any(c.isupper() for c in name) and any(c.islower() for c in name) and any(c.isdigit() for c in name) or (any(c in '_-' for c in name)))
+            rule2 = (any(c.isupper() for c in name) or any(c.islower() for c in name) and any(c.isdigit() for c in name) and (any(c in '_-' for c in name)))
+            rule3 = (any(c.isupper() for c in name) and any(c.islower() for c in name) or any(c.isdigit() for c in name) and (any(c in '_-' for c in name)))
+            rule4 = (any(c.isupper() for c in name) and any(c.islower() for c in name) and any(c.isdigit() for c in name) and (any(c in '_-' for c in name)))
+            if rule1 or rule2 or rule3 or rule4:
                 return True
     return False
 
@@ -52,13 +53,13 @@ def validate_cluster_desc(desc):
     pattern = r'^(?![-_])(?:[A-Z]+|[a-z]+|[0-9]+|[-_]+){2,}(?:[A-Z]+|[a-z]+|[0-9]+){1,}(?<![-_])$'
 
     # 使用正则表达式匹配名称
-    if re.match(pattern, name):
+    if re.match(pattern, desc):
         # 检查长度是否在2到64之间
-        if 2 <= len(name) <= 64:
+        if 2 <= len(desc) <= 64:
             # 检查是否至少包含3种不同的字符类型
-            if (any(c.isupper() for c in name) and
-                    any(c.islower() for c in name) and
-                    any(c.isdigit() for c in name) and
-                    (any(c in '_-' for c in name))):
+            if (any(c.isupper() for c in desc) and
+                    any(c.islower() for c in desc) and
+                    any(c.isdigit() for c in desc) and
+                    (any(c in '_-' for c in desc))):
                 return True
     return False

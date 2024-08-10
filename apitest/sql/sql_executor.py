@@ -4,7 +4,7 @@ import mysql.connector
 from mysql.connector import Error
 import logging
 
-from apitest.api.utils.utils import generate_random_string
+from apitest.api.framework.data_gen import generate_random_string
 
 
 # 单例模式，确保程序运行中只有一个mysql链接实例

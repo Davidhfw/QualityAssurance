@@ -1,0 +1,2 @@
+payload is  {"name": "_Abc", "desc": "", "cni_plugin": "flannel", "version": "1.24", "delete_protection": 0}
+res json is  {'code': 400, 'data': None, 'msg': 'name value is invalid, please check input again', 'error_code': 10001}

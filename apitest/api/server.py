@@ -1,10 +1,10 @@
 import time
 
 from flask import Flask, request
-from api_exceptions import *
-from apitest.api.utils.jwt_tools import create_jwt, secure
-from apitest.api.utils.utils import generate_random_string
-from apitest.api.validators.cluster import *
+from apitest.api.framework.excepts import *
+from apitest.api.framework.auth import create_jwt, secure
+from apitest.api.framework.data_gen import *
+from apitest.api.framework.validators import *
 from apitest.sql.sql_executor import DBExecutor
 
 app = Flask(__name__)
@@ -45,13 +45,20 @@ def create_cluster():
     cni_plugin = data['cni_plugin']
     # 检查所有输入参数类型是否合法
     if not isinstance(name, str):
-        return ClientParameterFailed(msg="name instance type is not string, please check input again")
+        return ClientParameterFailed(msg="name instance type is not str, please check input again")
+    if not validate_cluster_name(name):
+        return ClientParameterFailed(msg="name value is invalid, please check input again")
 
     if not isinstance(version, str):
-        return ClientParameterFailed(msg="version instance type is not string, please check input again")
+        return ClientParameterFailed(msg="version instance type is not str, please check input again")
+    if version not in ["1.24", "1.26", "1.28"]:
+        return ClientParameterFailed(msg="version value is invalid, please check input again")
 
-    if not isinstance(cni_plugin, str) or cni_plugin not in ["flannel", "k8s-cni", "calico"]:
+    if not isinstance(cni_plugin, str):
         return ClientParameterFailed(msg="parameter 'cni_plugin' type not string, please check input again")
+
+    if cni_plugin not in ["flannel", "k8s-cni", "calico"]:
+        return ClientParameterFailed(msg="parameter 'cni_plugin' value is invalid, please check input again")
 
     if 'desc' in data and not isinstance(data['desc'], str):
         return ClientParameterFailed(msg="parameter 'desc' type not string, please check input again")
@@ -75,10 +82,10 @@ def create_cluster():
     except Exception as e:
         raise e
     finally:
-        time.sleep(2)
+        time.sleep(0.5)
         status_phase = "Running"
         status_condition_type = "Ok"
-        _ = _update_cluster(cluster_id=cluster_id, **{"status_phase": status_phase, "status_condition_type": status_condition_type })
+        _ = _update_cluster_by_status(cluster_id=cluster_id, **{"status_phase": status_phase, "status_condition_type": status_condition_type})
 
 
 @app.route('/UpdateCluster', methods=['PUT'])
@@ -122,7 +129,7 @@ def update_cluster():
         delete_protection = None
 
     if 'desc' in data:
-        if not isinstance(data['desc'], str) or validate_cluster_desc(data['name']):
+        if not isinstance(data['desc'], str) or validate_cluster_desc(desc):
             return ClientParameterFailed(msg="parameter 'desc' type not str or invalid, please check it again")
         else:
             desc = data['desc']
@@ -305,14 +312,57 @@ def _delete_cluster(cluster_id, name):
     return result
 
 
-def _update_cluster(cluster_id, name, desc, delete_protection, **kwargs):
+def _update_cluster(cluster_id, name, desc, delete_protection):
     try:
         db.connect()
         update_query = ""
         data = ()
-        if cluster_id and name and desc and delete_protection:
+
+        if cluster_id and name:
+            update_query = "UPDATE cluster SET name = %s WHERE cluster_id = %s"
+            data = (name, cluster_id)
+
+        elif cluster_id and desc:
+            update_query = "UPDATE cluster SET description = %s WHERE cluster_id = %s"
+            data = (desc, cluster_id)
+
+        elif cluster_id and delete_protection:
+            update_query = "UPDATE cluster SET delete_protection = %d WHERE cluster_id = %s"
+            data = (delete_protection, cluster_id)
+
+        elif cluster_id and name and desc:
+            update_query = "UPDATE cluster SET name = %s and description = %s WHERE cluster_id = %s"
+            data = (name, desc, cluster_id)
+
+        elif cluster_id and name and delete_protection:
+            update_query = "UPDATE cluster SET name = %s and delete_protection = %s WHERE cluster_id = %s"
+            data = (name, delete_protection, cluster_id)
+
+        elif cluster_id and desc and delete_protection:
+            update_query = "UPDATE cluster SET delete_protection = %d and description = %s WHERE cluster_id = %s"
+            data = (desc, delete_protection, cluster_id)
+
+        elif cluster_id and name and desc and delete_protection:
             update_query = "UPDATE cluster SET name = %s and description = %s and delete_protection = %d WHERE cluster_id = %s"
             data = (name, desc, delete_protection, cluster_id)
+
+        db.update_sql(update_query, data)
+    except Exception as e:
+        raise e
+    finally:
+        db.close()
+    return cluster_id
+
+
+def _update_cluster_by_status(cluster_id, **kwargs):
+    try:
+        db.connect()
+        update_query = ""
+        data = ()
+        phase = kwargs.get("status_phase")
+        condition_type = kwargs.get("status_condition_type")
+        update_query = "UPDATE cluster SET status_phase = %s and status_condition_type = %s WHERE cluster_id = %s"
+        data = (phase, condition_type, cluster_id)
         db.update_sql(update_query, data)
     except Exception as e:
         raise e

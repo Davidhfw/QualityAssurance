@@ -1,0 +1,2 @@
+payload is  {"name": "JKM5D_Dj3sI-OIm4qST7il85WL09qgFTI", "desc": "", "cni_plugin": "flannel", "version": "1.24", "delete_protection": 0}
+res json is  {'code': 200, 'data': None, 'msg': 'ccxmql3wxkf1', 'error_code': 0}

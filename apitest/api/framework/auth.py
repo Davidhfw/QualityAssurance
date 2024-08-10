@@ -2,7 +2,7 @@
 import jwt
 import datetime
 
-from apitest.api.framework.self_define_exceptions import ClientAuthFailed
+from apitest.api.framework.excepts import ClientAuthFailed
 
 # 用于签名的密钥
 SECRET_KEY = 'your_secret_key'
@@ -52,11 +52,9 @@ def login(user_name, pwd):
 
 def secure(auth):
     # 从请求头中获取JWT
-    # auth_header = request.headers.get('Authorization')
-    auth_header = auth
     token = ""
-    if auth_header:
-        token = auth_header.split(" ")[1]
+    if auth:
+        token = auth
     else:
         raise ClientAuthFailed(msg='Token is missing')
 
