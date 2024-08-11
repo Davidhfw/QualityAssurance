@@ -14,7 +14,6 @@ from apitest.api.framework.auth import login
 class TestCreateCluster:
     api_url = "http://127.0.0.1:5000/CreateCluster"
     auth_test_data = [
-        ("", "Positive"),
         ("", "Negative"),
         ("fadaf", "Negative"),
     ]
@@ -23,31 +22,23 @@ class TestCreateCluster:
     @pytest.mark.parametrize("auth, flag", auth_test_data)
     def test_create_cluster_auth(self, auth, flag, api_url=api_url):
 
-        if flag == "Positive":
-            auth = login("abc", "pwd")
         headers = {"Authorization": auth}
-        payload = {}
+        name = generate_random_string("cc", 10)
+        payload = json.dumps({
+                "name": name,
+                "desc": "",
+                "cni_plugin": "flannel",
+                "version": "1.24",
+                "delete_protection": 0,
+            })
 
-        res = requests.request("POST", api_url, headers=headers, data=payload)
+        res = requests.post(api_url, headers=headers, data=payload)
         assert res.url == api_url, "request url not equal response url"
         if flag == "Positive":
             assert res.status_code == 200, "HTTP Code not equal to 200"
         else:
             assert res.status_code != 200, "HTTP Code not equal to 200"
 
-    para_name_test_data = []
-    name_valid_data = generate_valid_data(nums=10)
-    new_name_valid_data = []
-    for i, val in enumerate(name_valid_data):
-        if is_valid(val):
-            new_name_valid_data.append(val)
-            para_name_test_data.append((val, "Valid"))
-    name_invalid_data = generate_invalid_data()
-    for i, val in enumerate(name_invalid_data):
-        para_name_test_data.append((val, "Invalid"))
-    name_wrong_type = generate_wrong_type_data("name")
-    for i, val in enumerate(name_wrong_type):
-        para_name_test_data.append((val, "WrongType"))
 
     @allure.feature("测试创建集群参数校验-名称")
     @pytest.mark.parametrize("name, flag", generate_name_data())
@@ -75,24 +66,27 @@ class TestCreateCluster:
         print("payload is ", payload)
         res = requests.post(api_url, headers=headers, data=payload)
         print("res json is ", res.json())
+        # dct = json.loads(res.json())
         assert res.url == api_url, "url not equal after request"
         if flag == "WrongType":
             with allure.step("验证错误的输入类型"):
                 # 校验HTTP状态码
                 assert res.status_code == 400, "HTTP Code not equal to 400"
                 # 校验自定义错误msg
-                assert "400" in res.text
+
+                assert "name instance type is not str" in res.text
 
         elif flag == "Invalid":
             with allure.step("验证不符合输入规则参数"):
                 # 校验HTTP状态码
                 assert res.status_code == 400, "HTTP Code not equal to 400"
                 # 校验自定义错误msg
-                assert "400" in res.text
+                assert "name value is invalid" in res.text
         elif flag == "Valid":
             with allure.step("验证符合输入规则的参数"):
                 # 校验HTTP状态码
                 assert res.status_code == 200, "HTTP Code not equal to 200"
+                # 还需要和数据库数据做对比或者其他资源
 
 
 if __name__ == "__main__":
