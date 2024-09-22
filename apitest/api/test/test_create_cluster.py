@@ -10,7 +10,7 @@ from apitest.api.framework.data_gen import *
 from apitest.api.framework.auth import login
 
 
-@allure.feature("CreateCluster API Tests")
+@allure.epic("CreateCluster API Tests")
 class TestCreateCluster:
     api_url = "http://127.0.0.1:5000/CreateCluster"
     auth_test_data = [
