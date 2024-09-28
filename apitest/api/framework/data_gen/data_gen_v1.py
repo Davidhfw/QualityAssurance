@@ -48,6 +48,7 @@ def generate_invalid_data():
     return invalid_data
 
 
+
 def is_valid(data):
     """校验数据是否符合规则"""
     pattern = r'^(?![-_])(?:[A-Z]+|[a-z]+|[0-9]+|[-_]+){2,}(?:[A-Z]+|[a-z]+|[0-9]+){1,}(?<![-_])$'

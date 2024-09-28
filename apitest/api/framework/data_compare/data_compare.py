@@ -33,9 +33,9 @@ def compare_json(json1, json2, ignore_fields=[]):
 
 if __name__ == "__main__":
     # 示例使用
-    json1 = '{"name": "John", "age": 30, "city": "New York", "email": "john@example.com"}'
-    json2 = '{"name": "John", "age": 30, "city": "New York", "email": "john@example.com"}'
-    ignore_fields = ["email"]
+    json1 = '{"name": "John", "age": 30, "city": "New York", "email": "john@example.com", "timestamp": "1234555"}'
+    json2 = '{"name": "John", "age": 30, "city": "New York", "email": "john@example.com", "timestamp": "1234679000000"}'
+    ignore_fields = ["email", "timestamp"]
 
     result = compare_json(json1, json2, ignore_fields)
     print(result)  # 输出: True
