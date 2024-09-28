@@ -2,6 +2,8 @@
 import pytest
 
 from apitest.api.framework.data_gen import *
+from apitest.api.framework.data_gen.data_gen_v1 import generate_valid_data, is_valid, generate_invalid_data, \
+    generate_wrong_type_data
 
 
 @pytest.fixture()

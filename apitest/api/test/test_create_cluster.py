@@ -8,6 +8,7 @@ import allure
 
 from apitest.api.framework.data_gen import *
 from apitest.api.framework.auth import login
+from apitest.api.framework.data_gen.data_gen_v1 import generate_random_string, generate_name_data
 
 
 @allure.epic("CreateCluster API Tests")
